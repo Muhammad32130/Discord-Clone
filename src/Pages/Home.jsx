@@ -55,20 +55,46 @@ function Home({user, setuser}) {
     })
   }
   
-
+console.log(data)
 
   // e.target[0].value
   
   return (
     <div className='h-screen flex bg-[#313338]'>
+      <div onClick={()=>{setselected(false)}} className={`absolute -z-10  h-screen bg-[#0000]/70 w-[100%] left-[0%] bottom-[0%] ${selected && 'z-10'}`}>
+      </div>
+       <div className={`absolute rounded ml-auto ${!selected && 'grow '} max-w-[100%] w-[30%] max-h-[100%] bg-[#313338] m-auto left-0 right-0 bottom-[50%] text-[white] ${selected && 'small z-50'} `}>
+        <div className='mx-4 my-4 flex flex-col'>
+        <h1 className='font-semibold '>
+    Create Channel
+        </h1>
+        <p className='text-[12px] text-[white]/80 mt-1'>in Text Channels</p>
+        <form className='flex-col mt-4 flex font-semibold'>
+          <h1 className='text-[12px] text-[white]/90 font-bold mb-2'>
+          Channel Name
+          </h1>
+          <input className='bg-[#1E1F22] outline-none py-1 rounded' type="text" placeholder='# new-channel' />
+          <div className='flex justify-end mt-4'>
+          <button onClick={()=>{setselected(false)}} type='button' className='hover:underline transition-all'>Cancel</button>
+          <button className='bg-[#4752C4] ml-4 w-[30%] py-2 rounded'>Create Channel</button>
+          </div>
+        </form>
+        </div>
+      </div>
       <div className='bg-[#1E1F22]'>
         <button className='mt-6 bg-[gray]/30 text-[white] font-semibold rounded-[50%]  mx-4 px-6 py-4'>S</button>
       </div>
       <div className='bg-[#2B2D31] flex flex-col justify-between text-center'>
         <div>
-        <h1 className='mt-7 mx-1 uppercase text-[#DBDED6] text-sm font-medium'>Text Channels</h1>
+          <div className='flex justify-center items-end'>
+        <h1 className='mt-7 mx-1 uppercase text-[gray]  text-xs font-semibold transition-all  hover:text-[#DBDEE1]'>Text Channels</h1>
+        <button onClick={()=>{setselected(true)}} className='ml-6 w-6 h-5'><img className='invert hover:bg-[#b5bac1] transition-all rounded' src="https://www.freepnglogos.com/uploads/plus-icon/plus-icon-plus-math-icon-download-icons-9.png" alt="" /></button>
+          </div>
         <button  className='text-[#D5F3F5] mx-[4px] rounded mt-6 items-center pl-4 pr-20 flex hover:bg-[#404249] font-medium'>
+          <div className='flex'>
           <h1 className='pr-2 text-[gray] text-2xl font-medium'>#</h1> general
+   
+          </div>
         </button>
         </div>
     <div className='pr-2  text-[#f2f3f5] flex justify-between items-center text-[14px] font-medium bg-[#232428]'>
@@ -81,7 +107,7 @@ function Home({user, setuser}) {
       <div className='relative'>
     </div>
     </div>
-      <div className={`bg-[#232428] px-2 mr-10 absolute overflow-hidden translate-y-[100%] -z-10 bottom-14 opacity-0 left-[10%] ${settings && 'opacity-100 z-10 translate-y-[0%]'} transition-all`}>
+      <div className={`bg-[#232428] px-2 mr-10 absolute overflow-hidden bottom-5 -z-10 opacity-0 left-[10%] ${settings && ' translate-y-[-80%] opacity-100 z-10'} transition-all`}>
       <div className='flex flex-col'>
     <button className='pb-1 border-b '>Account</button>
       <button onClick={signout}>Sign Out</button>
