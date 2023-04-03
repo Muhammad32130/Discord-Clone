@@ -7,14 +7,15 @@ import { signOut } from 'firebase/auth'
 function Home({user, setuser}) {
   const [selected, setselected] = useState(undefined)
   const [data, setdata]=useState(null)
-  const [selectedChannel, setselectedchannel] = useState('General')
+  const [selectedserver, setselectedserver] = useState('General')
+  const [selectedchannel, setselectedchannel] = useState('General')
   const [channel, setchannel] = useState(null)
   const [settings, setsettings]=useState(null)
   const [server, setserver] =useState(null)
-  const [selectedsever, setserer] =useState(null)
-  const docre = doc(db, 'Servers', selectedChannel )
+
+  const docre = doc(db, 'Servers', selectedserver )
+  console.log(selectedserver)
   const username = user?.displayName
- console.log(selectedsever)
   async function messageHandler(e){
     e.preventDefault()
     const messages =  {
@@ -22,8 +23,8 @@ function Home({user, setuser}) {
       user:username
     }
     const newPost =  {
-      message: [
-        ...data.message,
+      [selectedchannel]: [
+        ...data[selectedchannel],
           messages.user +':'+ 
           messages.message
     ]
@@ -31,6 +32,13 @@ function Home({user, setuser}) {
     await updateDoc(docre, newPost)
     e.target[0].value =""
   }
+  
+
+
+
+
+
+
   async function Doc(){
     const data = await getDocs(collection(db, "Servers"));
     const posts = data.docs.map((doc)=>({ id: doc.id}))
@@ -38,41 +46,44 @@ function Home({user, setuser}) {
   }
   useEffect(()=>{
     Doc()
-  },[])
+  },[server,selectedserver,selectedchannel])
   async function Newdoc(e){
     e.preventDefault()
     await setDoc(doc(db, "Servers", e.target[0].value), {
       id:e.target[0].value,
-      message:[
+      general:[
 
       ]
     }).then(()=>{
       setselected(false)
+      setserver(false)
     }).catch((error)=>{
       
     })
   }
- 
   
+  async function Newchannel(e){
+    e.preventDefault()
+    await setDoc(doc(db, "Servers", selectedserver), {
+      ...data,
+      [e.target[0].value]:[
 
+      ]
+    }).then(()=>{
+      setselected(false)
+      setserver(false)
+    }).catch((error)=>{
+      
+    })
+  }
+console.log(data && data[selectedchannel])
   useEffect(()=>{
 
-    const unsub = onSnapshot(doc(db, "Servers", selectedChannel), (doc) => {
+    const unsub = onSnapshot(doc(db, "Servers", selectedserver), (doc) => {
       setdata(doc.data())
   });
-  },[selectedChannel])
-
-
-  async function newServer(e) {
-    e.preventDefault();
-    await setDoc(doc(db, e.target[0].value, "general"), {
-      id: e.target[0].value,
-      message: []
-    }).then(() => {
-      setserver(false);
-    });
-  }
- 
+  },[server,selectedserver,selectedchannel])
+console.log(data)
  
   function signout(){
     signOut(auth)
@@ -81,6 +92,9 @@ function Home({user, setuser}) {
       window.location.href = `${window.location.origin}`
     })
   }
+
+console.log(selectedchannel)
+
   // e.target[0].value
   
   return (
@@ -93,7 +107,7 @@ function Home({user, setuser}) {
     Create Channel
         </h1>
         <p className='text-[12px] text-[white]/80 mt-1'>in Text Channels</p>
-        <form onSubmit={(e)=>{Newdoc(e)}} className='flex-col mt-4 flex font-semibold'>
+        <form onSubmit={(e)=>{Newchannel(e)}} className='flex-col mt-4 flex font-semibold'>
           <h1 className='text-[12px] text-[white]/90 font-bold mb-2'>
           Channel Name
           </h1>
@@ -114,7 +128,7 @@ function Home({user, setuser}) {
     Customize your server
         </h1>
         <p className='text-[12px] text-center text-[gray]/80 mt-1'>Give your new server a personality with a name.</p>
-        <form onSubmit={(e)=>{newServer(e)}} className='flex-col mt-4 flex font-semibold'>
+        <form onSubmit={(e)=>{Newdoc(e)}} className='flex-col mt-4 flex font-semibold'>
           <h1 className='text-[12px] text-[gray]/90 font-bold mb-2'>
           Server Name
           </h1>
@@ -127,43 +141,50 @@ function Home({user, setuser}) {
         </div>
       </div>
       <div className='bg-[#1E1F22] flex flex-col justify-between'>
-        <button className='mt-6 bg-[gray]/30 text-[white] hover:bg-[#23A559] hover:rounded-2xl transition-all font-semibold rounded-[50%]  mx-4 px-6 py-5'>S</button>
-        <button onClick={()=>{setserver(true)}} className='mt-6 bg-[gray]/30 hover:bg-[#23A559] hover:rounded-2xl transition-all text-[white] mb-4 font-semibold rounded-[50%] mx-4 px-6 py-5'>
-        <img className="invert w-14 rounded" src="https://www.freepnglogos.com/uploads/plus-icon/plus-icon-plus-math-icon-download-icons-9.png" alt=""></img>
+        <div className='mx-4 flex flex-col items-center'>
+        {
+                channel?.map((names) =>{
+                  return (
+                    <button onClick={()=>{setselectedserver(names)}} className='mt-6 bg-[gray]/30 text-[white] hover:bg-[#23A559] hover:rounded-2xl transition-all font-semibold rounded-[50%] px-6 py-4'>{names[0].toUpperCase()}</button>
+
+                    )
+                })
+              }
+        </div>
+        <button onClick={()=>{setserver(true)}} className='mt-6 bg-[gray]/30 hover:bg-[#23A559] hover:rounded-2xl transition-all text-[white] mb-4 font-semibold rounded-[50%] mx-4 px-4 py-3'>
+        <img className="invert w-12 rounded" src="https://www.freepnglogos.com/uploads/plus-icon/plus-icon-plus-math-icon-download-icons-9.png" alt=""></img>
         </button>
       </div>
       <div className='bg-[#2B2D31] flex flex-col justify-between text-center'>
         <div>
-          <div className='flex justify-center items-end'>
+          <div className='flex justify-center items-end mb-6'>
         <h1 className='mt-7 mx-1 uppercase text-[gray]  text-xs font-semibold transition-all  hover:text-[#DBDEE1]'>Text Channels</h1>
         <button onClick={()=>{setselected(true)}} className='ml-6 w-6 h-5'><img className='invert hover:bg-[#b5bac1] transition-all rounded' src="https://www.freepnglogos.com/uploads/plus-icon/plus-icon-plus-math-icon-download-icons-9.png" alt="" /></button>
           </div>
-        <button  className='text-[#D5F3F5] mx-[4px] rounded mt-6 items-center pl-4 pr-20 flex hover:bg-[#404249] font-medium'>
-          <div className='flex flex-col w-[100%]'>
+        
+{data && Object.keys(data).filter((value)=> !value.includes('id')).map((arr)=>{
 
-              <h1 className='pr-2 flex text-[gray] text-2xl font-medium'># <h1 className='ml-2 text-base'>general</h1></h1>
-          </div>
-        </button>
-              {
-                channel?.map((names) =>{
-                  return (
-                    <button onClick={()=>{setselectedchannel(names)}} className='text-[#D5F3F5] w-[100%] mx-[4px] rounded mt-1 items-center pl-4 pr-20 flex hover:bg-[#404249] font-medium'>
+  return (
+          <button onClick={()=>{setselectedchannel(arr)}} className='text-[#D5F3F5] mx-[4px] rounded mt-[4px] items-center w-[95%] flex hover:bg-[#404249] font-medium'>
           <div className='flex flex-col w-[100%]'>
-
-              <h1 className='pr-2 flex text-[gray] w-[100%] text-2xl font-medium'># <h1 className='ml-2 w-[100%] whitespace-nowrap text-base text-left'>{names}</h1></h1>
+           <div className='pr-2 flex text-[gray] text-2xl font-medium'># <h1 className='ml-2 text-base'>{arr}</h1></div>
           </div>
-        </button>
-                    )
-                })
-              }
+          </button>
+    )
+})
+}
+
+            
+          
+             
         </div>
     <div className='pr-2  text-[#f2f3f5] flex justify-between items-center text-[14px] font-medium bg-[#232428]'>
       <div className='flex items-center my-1 ml-1 rounded-sm hover:bg-[#b5bac1]/50 transition-all'>
       <div className='bg-[#313338] mx-2 my-2 ml-2 flex justify-center items-center h-8 w-8 rounded-[50%] text-[white]'>{user?.displayName[0]}</div>
       {user?.displayName}
     </div>
-    <div onClick={()=>{setsettings(!settings)}} className=' cursor-pointer p-2 rounded-sm hover:bg-[#b5bac1]/50 transition-all'>
-      <img className='w-4 ' src="https://cdn-icons-png.flaticon.com/512/3524/3524640.png" alt="" />
+    <div onClick={()=>{setsettings(!settings)}} className='ml-6 cursor-pointer p-2 rounded-sm hover:bg-[#b5bac1]/50 transition-all'>
+      <img className='w-12 ' src="https://cdn-icons-png.flaticon.com/512/3524/3524640.png" alt="" />
       <div className='relative'>
     </div>
     </div>
@@ -178,7 +199,7 @@ function Home({user, setuser}) {
       </div>
       <div className='w-[100%] flex flex-col justify-end pb-4'>
       <h2 className='overflow-y-scroll'>     
-      {data?.message?.map((message=>{
+      {data?.[selectedchannel]?.map((message=>{
         const mess = message.split(":")
         return( 
           <div className='ml-0 flex mb-4'>
