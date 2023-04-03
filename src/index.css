@@ -5,7 +5,6 @@
 @layer components{
 .small{
     animation: grow .25s;
-   
 }
 @keyframes grow {
     from{
@@ -17,12 +16,14 @@
 }
 .grow{
 animation: shrink .25s;
+transition: all 250ms ease;
+z-index: -50;
 }
 @keyframes shrink {
-    from{
+    0%{
         transform: scale(1);
     }        
-    to{
+    100%{
         transform: scale(0);
     }
 }

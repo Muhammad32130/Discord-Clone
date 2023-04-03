@@ -13,7 +13,6 @@ function App() {
       setuser(user)
     } )
   },[])
-  console.log(user)
   return (
     <>
     

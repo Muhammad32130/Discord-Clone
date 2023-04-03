@@ -1,4 +1,4 @@
-import { addDoc, collection, doc, onSnapshot, updateDoc } from 'firebase/firestore'
+import { Firestore, addDoc, collection, collectionGroup, doc, getDocs, getFirestore, onSnapshot, setDoc, updateDoc } from 'firebase/firestore'
 import React, { useEffect, useState } from 'react'
 import { auth, db } from '../firebase'
 import { signOut } from 'firebase/auth'
@@ -7,9 +7,14 @@ import { signOut } from 'firebase/auth'
 function Home({user, setuser}) {
   const [selected, setselected] = useState(undefined)
   const [data, setdata]=useState(null)
+  const [selectedChannel, setselectedchannel] = useState('General')
+  const [channel, setchannel] = useState(null)
   const [settings, setsettings]=useState(null)
-  const docre = doc(db, 'Servers', 'General' )
+  const [server, setserver] =useState(null)
+  const [selectedsever, setserer] =useState(null)
+  const docre = doc(db, 'Servers', selectedChannel )
   const username = user?.displayName
+ console.log(selectedsever)
   async function messageHandler(e){
     e.preventDefault()
     const messages =  {
@@ -19,34 +24,58 @@ function Home({user, setuser}) {
     const newPost =  {
       message: [
         ...data.message,
-        
-        
           messages.user +':'+ 
           messages.message
-        
-        
     ]
   }
     await updateDoc(docre, newPost)
     e.target[0].value =""
-    
+  }
+  async function Doc(){
+    const data = await getDocs(collection(db, "Servers"));
+    const posts = data.docs.map((doc)=>({ id: doc.id}))
+      setchannel(posts?.map(post=>post.id))
   }
   useEffect(()=>{
+    Doc()
+  },[])
+  async function Newdoc(e){
+    e.preventDefault()
+    await setDoc(doc(db, "Servers", e.target[0].value), {
+      id:e.target[0].value,
+      message:[
 
-    const unsub = onSnapshot(doc(db, "Servers", "General"), (doc) => {
+      ]
+    }).then(()=>{
+      setselected(false)
+    }).catch((error)=>{
+      
+    })
+  }
+ 
+  
+
+  useEffect(()=>{
+
+    const unsub = onSnapshot(doc(db, "Servers", selectedChannel), (doc) => {
       setdata(doc.data())
   });
-    
-  },[])
- 
-  console.log(data)
-  if(data){
+  },[selectedChannel])
+  async function newServer(e){
+    e.preventDefault(
+    await setDoc(doc(db, e.target[0].value, "general"), {
+      id:e.target[0].value,
+      message:[
 
-    console.log(
-
-
-    )
+      ]
+    }).then(()=>{
+      setserver(false)
+    }).catch((error)=>{
+      
+    })
   }
+ 
+ 
   function signout(){
     signOut(auth)
     .then(()=>{
@@ -54,35 +83,56 @@ function Home({user, setuser}) {
       window.location.href = `${window.location.origin}`
     })
   }
-  
-console.log(data)
-
   // e.target[0].value
   
   return (
     <div className='h-screen flex bg-[#313338]'>
       <div onClick={()=>{setselected(false)}} className={`absolute -z-10  h-screen bg-[#0000]/70 w-[100%] left-[0%] bottom-[0%] ${selected && 'z-10'}`}>
       </div>
-       <div className={`absolute rounded ml-auto ${!selected && 'grow '} max-w-[100%] w-[30%] max-h-[100%] bg-[#313338] m-auto left-0 right-0 bottom-[50%] text-[white] ${selected && 'small z-50'} `}>
+       <div className={`absolute rounded ml-auto ${!selected && 'grow'} max-w-[100%] w-[30%] max-h-[100%] bg-[#313338] m-auto left-0 right-0 bottom-[50%] text-[white] ${selected && 'small z-50'} `}>
         <div className='mx-4 my-4 flex flex-col'>
         <h1 className='font-semibold '>
     Create Channel
         </h1>
         <p className='text-[12px] text-[white]/80 mt-1'>in Text Channels</p>
-        <form className='flex-col mt-4 flex font-semibold'>
+        <form onSubmit={(e)=>{Newdoc(e)}} className='flex-col mt-4 flex font-semibold'>
           <h1 className='text-[12px] text-[white]/90 font-bold mb-2'>
           Channel Name
           </h1>
           <input className='bg-[#1E1F22] outline-none py-1 rounded' type="text" placeholder='# new-channel' />
           <div className='flex justify-end mt-4'>
+            
           <button onClick={()=>{setselected(false)}} type='button' className='hover:underline transition-all'>Cancel</button>
           <button className='bg-[#4752C4] ml-4 w-[30%] py-2 rounded'>Create Channel</button>
           </div>
         </form>
         </div>
       </div>
-      <div className='bg-[#1E1F22]'>
-        <button className='mt-6 bg-[gray]/30 text-[white] font-semibold rounded-[50%]  mx-4 px-6 py-4'>S</button>
+      <div onClick={()=>{setserver(false)}} className={`absolute -z-10  h-screen bg-[#0000]/70 w-[100%] left-[0%] bottom-[0%] ${server && 'z-10'}`}>
+      </div>
+       <div className={`absolute rounded ml-auto ${!server && 'grow'} max-w-[100%] w-[30%] max-h-[100%] bg-[#FFFFFF] m-auto left-0 right-0 bottom-[50%] text-[#060607] ${server && 'small z-50'} `}>
+        <div className='mx-4 my-4 flex flex-col'>
+        <h1 className='font-bold text-xl text-center '>
+    Customize your server
+        </h1>
+        <p className='text-[12px] text-center text-[gray]/80 mt-1'>Give your new server a personality with a name.</p>
+        <form onSubmit={(e)=>{newServer(e)}} className='flex-col mt-4 flex font-semibold'>
+          <h1 className='text-[12px] text-[gray]/90 font-bold mb-2'>
+          Server Name
+          </h1>
+          <input className='bg-[#E3E5E8] outline-none py-1 rounded' type="text" />
+          <div className='flex justify-between mt-4'>
+          <button onClick={()=>{setserver(false)}} type='button' className='hover:underline transition-all'>Cancel</button>
+          <button className={`bg-[#4752C4] ml-4 w-[20%] py-2  text-[white] rounded`}>Create</button>
+          </div>
+        </form>
+        </div>
+      </div>
+      <div className='bg-[#1E1F22] flex flex-col justify-between'>
+        <button className='mt-6 bg-[gray]/30 text-[white] hover:bg-[#23A559] hover:rounded-2xl transition-all font-semibold rounded-[50%]  mx-4 px-6 py-5'>S</button>
+        <button onClick={()=>{setserver(true)}} className='mt-6 bg-[gray]/30 hover:bg-[#23A559] hover:rounded-2xl transition-all text-[white] mb-4 font-semibold rounded-[50%] mx-4 px-6 py-5'>
+        <img className="invert w-14 rounded" src="https://www.freepnglogos.com/uploads/plus-icon/plus-icon-plus-math-icon-download-icons-9.png" alt=""></img>
+        </button>
       </div>
       <div className='bg-[#2B2D31] flex flex-col justify-between text-center'>
         <div>
@@ -91,11 +141,23 @@ console.log(data)
         <button onClick={()=>{setselected(true)}} className='ml-6 w-6 h-5'><img className='invert hover:bg-[#b5bac1] transition-all rounded' src="https://www.freepnglogos.com/uploads/plus-icon/plus-icon-plus-math-icon-download-icons-9.png" alt="" /></button>
           </div>
         <button  className='text-[#D5F3F5] mx-[4px] rounded mt-6 items-center pl-4 pr-20 flex hover:bg-[#404249] font-medium'>
-          <div className='flex'>
-          <h1 className='pr-2 text-[gray] text-2xl font-medium'>#</h1> general
-   
+          <div className='flex flex-col w-[100%]'>
+
+              <h1 className='pr-2 flex text-[gray] text-2xl font-medium'># <h1 className='ml-2 text-base'>general</h1></h1>
           </div>
         </button>
+              {
+                channel?.map((names) =>{
+                  return (
+                    <button onClick={()=>{setselectedchannel(names)}} className='text-[#D5F3F5] w-[100%] mx-[4px] rounded mt-1 items-center pl-4 pr-20 flex hover:bg-[#404249] font-medium'>
+          <div className='flex flex-col w-[100%]'>
+
+              <h1 className='pr-2 flex text-[gray] w-[100%] text-2xl font-medium'># <h1 className='ml-2 w-[100%] whitespace-nowrap text-base text-left'>{names}</h1></h1>
+          </div>
+        </button>
+                    )
+                })
+              }
         </div>
     <div className='pr-2  text-[#f2f3f5] flex justify-between items-center text-[14px] font-medium bg-[#232428]'>
       <div className='flex items-center my-1 ml-1 rounded-sm hover:bg-[#b5bac1]/50 transition-all'>
@@ -117,7 +179,7 @@ console.log(data)
       </div>
       </div>
       <div className='w-[100%] flex flex-col justify-end pb-4'>
-      <h2>     
+      <h2 className='overflow-y-scroll'>     
       {data?.message?.map((message=>{
         const mess = message.split(":")
         return( 
