@@ -61,18 +61,16 @@ function Home({user, setuser}) {
       setdata(doc.data())
   });
   },[selectedChannel])
-  async function newServer(e){
-    e.preventDefault(
-    await setDoc(doc(db, e.target[0].value, "general"), {
-      id:e.target[0].value,
-      message:[
 
-      ]
-    }).then(()=>{
-      setserver(false)
-    }).catch((error)=>{
-      
-    })
+
+  async function newServer(e) {
+    e.preventDefault();
+    await setDoc(doc(db, e.target[0].value, "general"), {
+      id: e.target[0].value,
+      message: []
+    }).then(() => {
+      setserver(false);
+    });
   }
  
  
