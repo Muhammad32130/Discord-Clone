@@ -6,15 +6,14 @@ import {getAuth} from 'firebase/auth'
 import { getFirestore } from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
-
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyA62fKEPkk0cLv0Pju3XDlHCl3IlU0en3E",
-  authDomain: "discord-clone-edc82.firebaseapp.com",
-  projectId: "discord-clone-edc82",
-  storageBucket: "discord-clone-edc82.appspot.com",
-  messagingSenderId: "955087672652",
-  appId: "1:955087672652:web:03b2c7924f51682ef3ebe9"
+  apiKey: `${process.env.REACT_APP_API_KEY}`,
+  authDomain: `${process.env.REACT_APP_auth_Domain}`,
+  projectId: `${process.env.REACT_APP_project_Id}`,
+  storageBucket: `${process.env.REACT_APP_storage_Bucket}`,
+  messagingSenderId: `${process.env.REACT_APP_messaging_Sender_Id}`,
+  appId: `${process.env.REACT_APP_app_Id}`
 };
 
 // Initialize Firebase

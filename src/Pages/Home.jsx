@@ -208,6 +208,7 @@ console.log(selectedchannel)
             <div className='ml-4 max-[425px]:ml-2 max-[320px]:ml-2 max-[375px]:ml-2 flex justify-center flex-col'>
 
             <h2 className='max-[425px]:text-[14px] text-[#F2F3F5] max-[375px]:mt-2.5 max-[375px]:text-[10px] max-[320px]:mt-2 max-[320px]:text-[8px] font-medium mb-1 hover:underline'>
+            
             {mess[0]}
             </h2>
             <p className='text-[#DBDEE1] max-[425px]:text-[14px] break-all  max-[375px]:pr-2 max-[375px]:text-[14px] max-[320px]:pr-1 text-left max-[320px]:text-[12px]'>
